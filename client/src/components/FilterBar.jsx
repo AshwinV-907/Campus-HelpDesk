@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { 
   Search, 
   X, 
-  Filter, 
   LayoutGrid, 
   Table as TableIcon,
   RotateCcw,
-  SlidersHorizontal,
-  ChevronDown
+  ChevronDown,
+  Flame,
+  Filter
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -21,6 +21,7 @@ const CATEGORIES = [
 ];
 
 const STATUSES = ['All', 'Open', 'In Progress', 'Resolved'];
+const PRIORITIES = ['All', 'Urgent', 'High', 'Medium', 'Low'];
 
 export const FilterBar = ({
   searchQuery,
@@ -29,6 +30,8 @@ export const FilterBar = ({
   onCategoryChange,
   selectedStatus,
   onStatusChange,
+  selectedPriority,
+  onPriorityChange,
   sortBy,
   onSortChange,
   viewMode,
@@ -36,28 +39,44 @@ export const FilterBar = ({
   onResetFilters,
   totalResults,
 }) => {
+  const searchInputRef = useRef(null);
+
+  // Keyboard shortcut '/' to quickly focus search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === '/' && document.activeElement !== searchInputRef.current && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const hasActiveFilters = 
     searchQuery.trim() !== '' || 
     selectedCategory !== 'All' || 
     selectedStatus !== 'All' ||
+    (selectedPriority && selectedPriority !== 'All') ||
     sortBy !== 'newest';
 
   return (
     <div className="filter-bar-root">
       <div className="filter-bar-main">
-        {/* Search Input */}
+        {/* Search Input with Keyboard Shortcut hint */}
         <div className="search-input-wrapper">
           <Search size={18} className="search-icon" />
           <input
+            ref={searchInputRef}
             type="text"
             className="search-input"
-            placeholder="Search by ticket ID, issue title, location, or name..."
+            placeholder="Search by ticket ID, issue title, location, or name (Press '/' to search)..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             id="input-ticket-search"
             aria-label="Search campus support tickets"
           />
-          {searchQuery && (
+          {searchQuery ? (
             <button
               type="button"
               className="search-clear-btn"
@@ -67,6 +86,8 @@ export const FilterBar = ({
             >
               <X size={15} />
             </button>
+          ) : (
+            <kbd className="search-kbd-hint" title="Press / to search">/</kbd>
           )}
         </div>
 
@@ -104,6 +125,25 @@ export const FilterBar = ({
               {STATUSES.filter((s) => s !== 'All').map((st) => (
                 <option key={st} value={st}>
                   {st}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={14} className="select-arrow" />
+          </div>
+
+          {/* Priority Dropdown */}
+          <div className="select-wrapper">
+            <label htmlFor="filter-priority" className="visually-hidden">Filter by Urgency</label>
+            <select
+              id="filter-priority"
+              className="filter-select"
+              value={selectedPriority || 'All'}
+              onChange={(e) => onPriorityChange(e.target.value)}
+            >
+              <option value="All">All Urgencies</option>
+              {PRIORITIES.filter((p) => p !== 'All').map((pr) => (
+                <option key={pr} value={pr}>
+                  {pr} Priority
                 </option>
               ))}
             </select>
@@ -159,6 +199,7 @@ export const FilterBar = ({
           Showing <strong>{totalResults}</strong> {totalResults === 1 ? 'request' : 'requests'}
           {selectedCategory !== 'All' && <span className="active-filter-badge">Category: {selectedCategory}</span>}
           {selectedStatus !== 'All' && <span className="active-filter-badge">Status: {selectedStatus}</span>}
+          {selectedPriority && selectedPriority !== 'All' && <span className="active-filter-badge">Priority: {selectedPriority}</span>}
           {searchQuery && <span className="active-filter-badge">Query: &quot;{searchQuery}&quot;</span>}
         </div>
 
@@ -170,7 +211,7 @@ export const FilterBar = ({
             id="btn-reset-filters"
           >
             <RotateCcw size={13} />
-            Reset Filters
+            Reset All Filters
           </button>
         )}
       </div>

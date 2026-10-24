@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
 import { StatsOverview } from './components/StatsOverview';
 import { FilterBar } from './components/FilterBar';
@@ -15,6 +15,17 @@ import {
   deleteTicket, 
   checkHealth 
 } from './services/api';
+import { 
+  Flame, 
+  Wifi, 
+  Tv, 
+  CheckCircle2, 
+  Plus, 
+  Sparkles,
+  Zap,
+  Clock,
+  ShieldAlert
+} from 'lucide-react';
 import './styles/App.css';
 
 export function App() {
@@ -30,6 +41,7 @@ export function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedPriority, setSelectedPriority] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
 
@@ -64,6 +76,7 @@ export function App() {
           q: searchQuery,
           category: selectedCategory,
           status: selectedStatus,
+          priority: selectedPriority,
           sortBy,
         }),
         getStats(),
@@ -97,7 +110,7 @@ export function App() {
       setLoading(false);
       setIsRefreshing(false);
     }
-  }, [searchQuery, selectedCategory, selectedStatus, sortBy]);
+  }, [searchQuery, selectedCategory, selectedStatus, selectedPriority, sortBy]);
 
   // Initial load + background polling every 12s
   useEffect(() => {
@@ -116,7 +129,7 @@ export function App() {
   };
 
   // Handle status update
-  const handleStatusChange = async (ticketId, newStatus) => {
+  const handleStatusChange = async (ticketId, newStatus, customNote) => {
     setUpdatingTicketId(ticketId);
     
     // Find current ticket to revert if needed
@@ -132,7 +145,7 @@ export function App() {
       const response = await updateTicketStatus(
         ticketId, 
         newStatus, 
-        `Status changed to ${newStatus} via Operations Dashboard`
+        customNote || `Status changed to ${newStatus} via Operations Dashboard`
       );
 
       // Refresh stats in background
@@ -196,6 +209,13 @@ export function App() {
     }
   };
 
+  // Quick filter helpers from hero
+  const handleQuickFilter = (category, priority = 'All') => {
+    setSelectedCategory(category);
+    setSelectedPriority(priority);
+    setSelectedStatus('All');
+  };
+
   // Handle stat card click
   const handleStatusFilterFromCard = (statusKey) => {
     setSelectedStatus((prev) => (prev === statusKey ? 'All' : statusKey));
@@ -206,6 +226,7 @@ export function App() {
     setSearchQuery('');
     setSelectedCategory('All');
     setSelectedStatus('All');
+    setSelectedPriority('All');
     setSortBy('newest');
   };
 
@@ -224,14 +245,68 @@ export function App() {
       {/* Main Container */}
       <main className="main-content">
         <div className="content-container">
-          {/* Header Banner / Welcome */}
+          {/* Header Showcase Banner with Ambient Radial Glow */}
           <section className="dashboard-hero">
-            <div className="hero-text-block">
-              <span className="hero-badge">Campus Operations Portal</span>
-              <h2 className="hero-heading">Campus Helpdesk Dashboard</h2>
-              <p className="hero-subtext">
-                Centralized resolution for student and faculty reports across Wi-Fi networks, classroom multimedia, ID card access, lab computing, and campus facilities.
-              </p>
+            <div className="hero-content-wrapper">
+              <div className="hero-text-block">
+                <div className="hero-badge-group">
+                  <span className="hero-badge">Campus Operations Portal</span>
+                  <span className="hero-live-pill">
+                    <span className="live-pulsing-dot"></span>
+                    Live Dispatch
+                  </span>
+                </div>
+
+                <h2 className="hero-heading">Campus Helpdesk Operations Hub</h2>
+                <p className="hero-subtext">
+                  Centralized command center resolving campus incidents across Wi-Fi networks, classroom multimedia, ID card access, and laboratory equipment.
+                </p>
+
+                {/* Live SLA & Operations Metrics */}
+                <div className="hero-meta-strip">
+                  <div className="meta-strip-item">
+                    <Clock size={14} className="meta-strip-icon" />
+                    <span>Avg Triage: <strong>&lt; 15 mins</strong></span>
+                  </div>
+                  <div className="meta-strip-item">
+                    <Zap size={14} className="meta-strip-icon text-amber" />
+                    <span>Active Zones: <strong>6 Campus Wings</strong></span>
+                  </div>
+                  <div className="meta-strip-item">
+                    <ShieldAlert size={14} className="meta-strip-icon text-blue" />
+                    <span>Resolution SLA: <strong>98.4% On-Time</strong></span>
+                  </div>
+                </div>
+
+                {/* Quick Action Shortcuts */}
+                <div className="hero-quick-filters">
+                  <span className="quick-filters-label">Quick Triage:</span>
+                  <button 
+                    type="button" 
+                    className={`quick-filter-btn ${selectedPriority === 'Urgent' ? 'is-active' : ''}`}
+                    onClick={() => handleQuickFilter('All', 'Urgent')}
+                  >
+                    <Flame size={13} className="quick-btn-icon text-rose" />
+                    <span>Urgent Incidents</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`quick-filter-btn ${selectedCategory === 'Wi-Fi & Network' ? 'is-active' : ''}`}
+                    onClick={() => handleQuickFilter('Wi-Fi & Network')}
+                  >
+                    <Wifi size={13} className="quick-btn-icon text-blue" />
+                    <span>Wi-Fi Disruptions</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    className={`quick-filter-btn ${selectedCategory === 'Classroom Equipment' ? 'is-active' : ''}`}
+                    onClick={() => handleQuickFilter('Classroom Equipment')}
+                  >
+                    <Tv size={13} className="quick-btn-icon text-amber" />
+                    <span>Classroom AV</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -250,6 +325,8 @@ export function App() {
             onCategoryChange={setSelectedCategory}
             selectedStatus={selectedStatus}
             onStatusChange={setSelectedStatus}
+            selectedPriority={selectedPriority}
+            onPriorityChange={setSelectedPriority}
             sortBy={sortBy}
             onSortChange={setSortBy}
             viewMode={viewMode}
@@ -270,7 +347,7 @@ export function App() {
               />
             ) : tickets.length === 0 ? (
               <EmptyState
-                type={searchQuery || selectedCategory !== 'All' || selectedStatus !== 'All' ? 'no-results' : 'all-clear'}
+                type={searchQuery || selectedCategory !== 'All' || selectedStatus !== 'All' || selectedPriority !== 'All' ? 'no-results' : 'all-clear'}
                 onResetFilters={handleResetFilters}
                 onOpenNewModal={() => setIsModalOpen(true)}
               />
@@ -297,6 +374,17 @@ export function App() {
           </section>
         </div>
       </main>
+
+      {/* Floating Action Button (Mobile only) */}
+      <button
+        type="button"
+        className="btn-fab-mobile"
+        onClick={() => setIsModalOpen(true)}
+        aria-label="Submit new incident report"
+        title="New Support Request"
+      >
+        <Plus size={22} strokeWidth={2.6} />
+      </button>
 
       {/* Footer */}
       <footer className="app-footer">

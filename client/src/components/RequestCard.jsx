@@ -16,8 +16,11 @@ import {
   Check, 
   Clock, 
   AlertCircle,
+  AlertTriangle,
+  Flame,
   Loader2,
-  ExternalLink
+  Copy,
+  CheckCheck
 } from 'lucide-react';
 
 const CATEGORY_ICONS = {
@@ -29,6 +32,21 @@ const CATEGORY_ICONS = {
   'Other': HelpCircle,
 };
 
+const PRIORITY_ICONS = {
+  'Urgent': Flame,
+  'High': AlertTriangle,
+  'Medium': AlertCircle,
+  'Low': Clock,
+};
+
+// Generate initials avatar
+const getInitials = (name) => {
+  if (!name) return 'U';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
+
 export const RequestCard = ({ 
   ticket, 
   onStatusChange, 
@@ -38,8 +56,11 @@ export const RequestCard = ({
   const [showHistory, setShowHistory] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedLoc, setCopiedLoc] = useState(false);
 
   const CategoryIcon = CATEGORY_ICONS[ticket.category] || HelpCircle;
+  const PriorityIcon = PRIORITY_ICONS[ticket.priority] || AlertCircle;
 
   // Format date helper
   const formatDate = (dateString) => {
@@ -75,6 +96,20 @@ export const RequestCard = ({
     }
   };
 
+  const handleCopyId = (e) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(ticket.ticketId);
+    setCopiedId(true);
+    setTimeout(() => setCopiedId(false), 2000);
+  };
+
+  const handleCopyLocation = (e) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(ticket.location);
+    setCopiedLoc(true);
+    setTimeout(() => setCopiedLoc(false), 2000);
+  };
+
   const handleStatusSelect = async (newStatus) => {
     if (newStatus === ticket.status) {
       setStatusMenuOpen(false);
@@ -103,7 +138,17 @@ export const RequestCard = ({
       {/* Top Meta Bar */}
       <div className="card-top-bar">
         <div className="id-and-category">
-          <span className="ticket-id-tag">{ticket.ticketId}</span>
+          <button 
+            type="button" 
+            className="ticket-id-tag interactive-copy" 
+            onClick={handleCopyId}
+            title="Click to copy ticket ID"
+            aria-label={`Copy ticket ID ${ticket.ticketId}`}
+          >
+            <span>{ticket.ticketId}</span>
+            {copiedId ? <CheckCheck size={12} className="copied-icon" /> : <Copy size={11} className="copy-icon" />}
+          </button>
+
           <span className="ticket-category-badge">
             <CategoryIcon size={14} className="cat-icon" />
             <span>{ticket.category}</span>
@@ -111,9 +156,10 @@ export const RequestCard = ({
         </div>
 
         <div className="card-top-right">
-          {/* Priority Badge */}
+          {/* Priority Badge with Icon */}
           <span className={`priority-badge priority-${(ticket.priority || 'medium').toLowerCase()}`}>
-            {ticket.priority || 'Medium'}
+            <PriorityIcon size={12} />
+            <span>{ticket.priority || 'Medium'}</span>
           </span>
 
           {/* Delete Button */}
@@ -136,20 +182,35 @@ export const RequestCard = ({
       {/* Description */}
       <p className="ticket-desc">{ticket.description}</p>
 
-      {/* Location & Contact Meta Info */}
+      {/* Location & Reporter Details Box */}
       <div className="ticket-details-box">
+        {/* Location Row with Copy */}
         <div className="detail-row">
           <MapPin size={15} className="detail-icon" />
           <span className="detail-location">{ticket.location}</span>
+          <button 
+            type="button" 
+            className="btn-copy-micro" 
+            onClick={handleCopyLocation}
+            title="Copy location"
+            aria-label="Copy location text"
+          >
+            {copiedLoc ? 'Copied' : <Copy size={11} />}
+          </button>
         </div>
 
-        <div className="detail-row">
-          <User size={15} className="detail-icon" />
-          <span className="detail-contact">
-            <strong>{ticket.contactName}</strong>
-            {ticket.contactEmail && <span className="detail-email"> • {ticket.contactEmail}</span>}
-            {ticket.contactPhone && <span className="detail-phone"> • {ticket.contactPhone}</span>}
-          </span>
+        {/* Reporter Contact Info with Avatar Badge */}
+        <div className="detail-row reporter-row">
+          <div className="reporter-avatar" aria-hidden="true">
+            {getInitials(ticket.contactName)}
+          </div>
+          <div className="reporter-meta">
+            <span className="detail-contact-name">{ticket.contactName}</span>
+            <span className="detail-contact-sub">
+              {ticket.contactEmail && <span>{ticket.contactEmail}</span>}
+              {ticket.contactPhone && <span> • {ticket.contactPhone}</span>}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -160,7 +221,7 @@ export const RequestCard = ({
           <span>{getRelativeTime(ticket.createdAt)}</span>
         </div>
 
-        {/* Status Dropdown Pill */}
+        {/* Status Dropdown Pill with micro animation */}
         <div className="status-dropdown-container">
           <button
             type="button"
@@ -174,7 +235,7 @@ export const RequestCard = ({
             {isUpdating ? (
               <Loader2 size={13} className="spin-icon" />
             ) : (
-              <span className="status-dot"></span>
+              <span className={`status-dot ${ticket.status !== 'Resolved' ? 'pulse-dot' : ''}`}></span>
             )}
             <span className="status-text">{ticket.status}</span>
             <ChevronDown size={13} className={`chevron ${statusMenuOpen ? 'rotate' : ''}`} />
@@ -193,7 +254,7 @@ export const RequestCard = ({
                   }`}
                   onClick={() => handleStatusSelect(st)}
                 >
-                  <span className="status-dot"></span>
+                  <span className={`status-dot ${st !== 'Resolved' ? 'pulse-dot' : ''}`}></span>
                   <span>{st}</span>
                   {ticket.status === st && <Check size={14} className="check-icon" />}
                 </button>
@@ -203,7 +264,7 @@ export const RequestCard = ({
         </div>
       </div>
 
-      {/* Audit History Toggle */}
+      {/* Audit History / Timeline Toggle */}
       {ticket.statusHistory && ticket.statusHistory.length > 0 && (
         <div className="card-history-section">
           <button

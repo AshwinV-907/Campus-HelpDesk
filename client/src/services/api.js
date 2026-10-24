@@ -56,6 +56,7 @@ export const getTickets = async (filters = {}) => {
   if (filters.q) params.append('q', filters.q);
   if (filters.category && filters.category !== 'All') params.append('category', filters.category);
   if (filters.status && filters.status !== 'All') params.append('status', filters.status);
+  if (filters.priority && filters.priority !== 'All') params.append('priority', filters.priority);
   if (filters.sortBy) params.append('sortBy', filters.sortBy);
 
   const endpoint = `/tickets${params.toString() ? `?${params.toString()}` : ''}`;

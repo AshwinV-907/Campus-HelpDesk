@@ -22,21 +22,28 @@ export const ToastNotification = ({ toast, onClose }) => {
 
   return (
     <div className={`toast-container toast-${toast.type || 'info'}`} role="status" aria-live="polite">
-      <div className="toast-icon">
-        <Icon size={18} />
+      <div className="toast-body">
+        <div className="toast-icon">
+          <Icon size={18} />
+        </div>
+        <div className="toast-content">
+          <div className="toast-title">{toast.title || (toast.type === 'error' ? 'Error' : 'Notice')}</div>
+          {toast.message && <div className="toast-message">{toast.message}</div>}
+        </div>
+        <button 
+          type="button" 
+          className="toast-close-btn" 
+          onClick={onClose}
+          aria-label="Close notification"
+        >
+          <X size={15} />
+        </button>
       </div>
-      <div className="toast-content">
-        <div className="toast-title">{toast.title || (toast.type === 'error' ? 'Error' : 'Notice')}</div>
-        {toast.message && <div className="toast-message">{toast.message}</div>}
+      
+      {/* Visual countdown progress bar */}
+      <div className="toast-progress-track">
+        <div className="toast-progress-fill"></div>
       </div>
-      <button 
-        type="button" 
-        className="toast-close-btn" 
-        onClick={onClose}
-        aria-label="Close notification"
-      >
-        <X size={15} />
-      </button>
     </div>
   );
 };
