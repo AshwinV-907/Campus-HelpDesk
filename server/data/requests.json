@@ -1,0 +1,179 @@
+[
+  {
+    "ticketId": "CMP-1048",
+    "title": "Auditorium Wireless Mic Feedback Screech",
+    "category": "Classroom Equipment",
+    "description": "Wireless handheld mic emits high-frequency audio feedback buzz whenever speaker walks left.",
+    "location": "Main Auditorium - Stage Podium",
+    "contactName": "Ananya Deshmukh",
+    "contactEmail": "ananya.d@campus.edu",
+    "contactPhone": "+91 98888 77766",
+    "priority": "High",
+    "status": "In Progress",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-24T05:25:53.780Z",
+        "note": "Ticket submitted by Ananya Deshmukh"
+      },
+      {
+        "status": "In Progress",
+        "timestamp": "2026-10-24T05:26:04.474Z",
+        "note": "Audio technician assigned"
+      }
+    ],
+    "createdAt": "2026-10-24T05:25:53.780Z",
+    "updatedAt": "2026-10-24T05:26:04.474Z"
+  },
+  {
+    "ticketId": "CMP-1047",
+    "title": "Cafeteria Digital Payment Terminal Offline",
+    "category": "Wi-Fi & Network",
+    "description": "UPI and POS card reader machines at counter 2 and 4 cannot reach the gateway, causing massive lunch queues.",
+    "location": "Student Center - Main Dining Hall",
+    "contactName": "Vikram Reddy",
+    "contactEmail": "v.reddy@campus.edu",
+    "contactPhone": "",
+    "priority": "High",
+    "status": "Open",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-24T05:16:46.438Z",
+        "note": "Ticket submitted by Vikram Reddy"
+      }
+    ],
+    "createdAt": "2026-10-24T05:16:46.438Z",
+    "updatedAt": "2026-10-24T05:16:46.438Z"
+  },
+  {
+    "ticketId": "CMP-1042",
+    "title": "Science Block Wi-Fi Dropping Frequently",
+    "category": "Wi-Fi & Network",
+    "description": "The Wi-Fi access point in Science Block 2nd floor disconnects every 5 to 10 minutes, disrupting ongoing lab sessions and student submissions.",
+    "location": "Science Block - 2nd Floor Corridor",
+    "contactName": "Aarav Sharma",
+    "contactEmail": "aarav.sharma@campus.edu",
+    "contactPhone": "+91 98765 43210",
+    "priority": "High",
+    "status": "In Progress",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-22T05:15:47.017Z",
+        "note": "Ticket created by student"
+      },
+      {
+        "status": "In Progress",
+        "timestamp": "2026-10-23T05:15:47.018Z",
+        "note": "Network team dispatched to inspect router AP-04"
+      }
+    ],
+    "createdAt": "2026-10-22T05:15:47.018Z",
+    "updatedAt": "2026-10-23T05:15:47.018Z"
+  },
+  {
+    "ticketId": "CMP-1043",
+    "title": "Projector HDMI port damaged in LH-301",
+    "category": "Classroom Equipment",
+    "description": "During morning lectures, the overhead projector keeps flickering green and loses audio connection when plugged into student laptops.",
+    "location": "Lecture Hall Complex - Room 301",
+    "contactName": "Prof. Meera Sen",
+    "contactEmail": "m.sen@campus.edu",
+    "contactPhone": "+91 98111 22334",
+    "priority": "Urgent",
+    "status": "In Progress",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-24T00:15:47.018Z",
+        "note": "Ticket logged by faculty"
+      },
+      {
+        "status": "In Progress",
+        "timestamp": "2026-10-24T05:16:31.496Z",
+        "note": "Technician dispatched to Room 301"
+      }
+    ],
+    "createdAt": "2026-10-24T00:15:47.018Z",
+    "updatedAt": "2026-10-24T05:16:31.496Z"
+  },
+  {
+    "ticketId": "CMP-1044",
+    "title": "RFID Turnstile Error at Girls Hostel Block B",
+    "category": "ID Card & Access",
+    "description": "Smart campus ID cards are failing to scan at the east entry gate turnstile. Students are having to enter manually in the physical register.",
+    "location": "Hostel Block B - East Entrance Gate",
+    "contactName": "Sneha Patel",
+    "contactEmail": "sneha.p@campus.edu",
+    "contactPhone": "+91 98222 33445",
+    "priority": "High",
+    "status": "In Progress",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-22T17:15:47.018Z",
+        "note": "Reported by hostel warden"
+      },
+      {
+        "status": "In Progress",
+        "timestamp": "2026-10-23T17:15:47.018Z",
+        "note": "Security electronics technician notified"
+      }
+    ],
+    "createdAt": "2026-10-22T17:15:47.018Z",
+    "updatedAt": "2026-10-23T17:15:47.018Z"
+  },
+  {
+    "ticketId": "CMP-1045",
+    "title": "MATLAB Simulation License Error in CAD Lab",
+    "category": "Lab Software & PC",
+    "description": "Workstations 12 through 18 show \"License Server Unreachable (Error -15)\" when trying to start MATLAB for the Computational Fluid Dynamics assignment.",
+    "location": "Mechanical Engineering Block - CAD Lab 2",
+    "contactName": "Rohan Verma",
+    "contactEmail": "rohan.v@campus.edu",
+    "contactPhone": "+91 98333 44556",
+    "priority": "Medium",
+    "status": "Open",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-24T02:15:47.018Z",
+        "note": "Logged by lab assistant"
+      }
+    ],
+    "createdAt": "2026-10-24T02:15:47.018Z",
+    "updatedAt": "2026-10-24T02:15:47.019Z"
+  },
+  {
+    "ticketId": "CMP-1046",
+    "title": "Library Central AC Not Cooling Reading Room",
+    "category": "Hostel & Facility",
+    "description": "Central HVAC air duct is blowing warm air in the quiet study area on the 3rd floor. Room temperature is exceeding 31°C making study difficult.",
+    "location": "Central Library - 3rd Floor Quiet Study Hall",
+    "contactName": "Devansh Kulkarni",
+    "contactEmail": "devansh.k@campus.edu",
+    "contactPhone": "+91 98444 55667",
+    "priority": "Medium",
+    "status": "Resolved",
+    "statusHistory": [
+      {
+        "status": "Open",
+        "timestamp": "2026-10-20T05:15:47.019Z",
+        "note": "Reported by librarian"
+      },
+      {
+        "status": "In Progress",
+        "timestamp": "2026-10-21T05:15:47.019Z",
+        "note": "HVAC technician serviced chiller unit 2"
+      },
+      {
+        "status": "Resolved",
+        "timestamp": "2026-10-23T05:15:47.019Z",
+        "note": "Cooling restored to 22°C. Verified by library staff."
+      }
+    ],
+    "createdAt": "2026-10-20T05:15:47.019Z",
+    "updatedAt": "2026-10-23T05:15:47.019Z"
+  }
+]

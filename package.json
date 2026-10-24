@@ -1,0 +1,11 @@
+{
+  "name": "campus-helpdesk-app",
+  "version": "1.0.0",
+  "description": "Vibe Coding Workshop Final Showcase - Campus Helpdesk App",
+  "private": true,
+  "scripts": {
+    "server": "npm run dev --prefix server",
+    "client": "npm run dev --prefix client",
+    "start": "node server/server.js"
+  }
+}
