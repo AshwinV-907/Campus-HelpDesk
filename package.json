@@ -3,9 +3,17 @@
   "version": "1.0.0",
   "description": "Vibe Coding Workshop Final Showcase - Campus Helpdesk App",
   "private": true,
+  "type": "module",
   "scripts": {
     "server": "npm run dev --prefix server",
     "client": "npm run dev --prefix client",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "build": "cd client && npm install && npm run build"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
   }
 }

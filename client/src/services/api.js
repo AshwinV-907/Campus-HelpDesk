@@ -4,7 +4,9 @@
  */
 
 const PROXY_API = '/api';
-const DIRECT_API = 'http://localhost:5000/api';
+const isLocal = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const DIRECT_API = isLocal ? 'http://localhost:5000/api' : '/api';
 
 const resilientFetch = async (endpoint, options = {}, timeoutMs = 6000) => {
   const controller = new AbortController();

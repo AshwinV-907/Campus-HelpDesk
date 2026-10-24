@@ -1,10 +1,13 @@
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_FILE = path.join(__dirname, 'requests.json');
+const DATA_FILE = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'requests.json')
+  : path.join(__dirname, 'requests.json');
 
 const INITIAL_REQUESTS = [
   {
