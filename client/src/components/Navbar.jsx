@@ -3,9 +3,8 @@ import {
   ShieldCheck, 
   Plus, 
   RotateCw, 
-  Server, 
-  HelpCircle,
-  Sparkles
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 
 export const Navbar = ({ 
@@ -13,6 +12,7 @@ export const Navbar = ({
   onOpenNewModal, 
   onRefresh, 
   isRefreshing,
+  lastSyncedAt,
   ticketCount 
 }) => {
   return (
@@ -45,7 +45,7 @@ export const Navbar = ({
             <span className="status-label">
               {serverStatus.status === 'online' ? (
                 <>
-                  <span className="status-text-main">System Online</span>
+                  <span className="status-text-main">Connected</span>
                   <span className="status-text-sub">({serverStatus.storageMode || 'live'})</span>
                 </>
               ) : (
@@ -54,17 +54,20 @@ export const Navbar = ({
             </span>
           </div>
 
-          {/* Refresh Button */}
+          {/* Sync Button with last synced time */}
           <button 
             type="button"
             className="btn-secondary btn-icon"
             onClick={onRefresh}
             disabled={isRefreshing}
-            title="Refresh tickets and statistics"
-            aria-label="Refresh data"
+            title={lastSyncedAt ? `Last synced: ${lastSyncedAt}. Click to refresh.` : 'Sync data with server'}
+            aria-label="Synchronize data with server"
+            id="btn-sync-server"
           >
-            <RotateCw size={17} className={isRefreshing ? 'spin-icon' : ''} />
-            <span className="btn-text-desktop">Sync</span>
+            <RotateCw size={16} className={isRefreshing ? 'spin-icon' : ''} />
+            <span className="btn-text-desktop">
+              {isRefreshing ? 'Syncing...' : lastSyncedAt ? `Synced ${lastSyncedAt}` : 'Sync'}
+            </span>
           </button>
 
           {/* New Request Button */}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Navbar } from './components/Navbar';
 import { StatsOverview } from './components/StatsOverview';
 import { FilterBar } from './components/FilterBar';
@@ -23,6 +23,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastSyncedAt, setLastSyncedAt] = useState('');
   const [serverStatus, setServerStatus] = useState({ status: 'checking', storageMode: 'file-storage' });
 
   // Filters & Layout State
@@ -41,8 +42,13 @@ export function App() {
     setToast({ type, title, message, id: Date.now() });
   };
 
+  const formatCurrentTime = () => {
+    const d = new Date();
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
   // Check health and fetch data
-  const loadData = useCallback(async (isInitial = false) => {
+  const loadData = useCallback(async (isInitial = false, isManual = false) => {
     if (isInitial) setLoading(true);
     else setIsRefreshing(true);
     setError(null);
@@ -69,20 +75,45 @@ export function App() {
       if (statsResponse && statsResponse.stats) {
         setStats(statsResponse.stats);
       }
+
+      const syncTime = formatCurrentTime();
+      setLastSyncedAt(syncTime);
+
+      if (isManual) {
+        showToast(
+          'success',
+          'Server Synchronized',
+          `Loaded ${ticketsResponse?.data?.length || 0} tickets at ${syncTime}.`
+        );
+      }
     } catch (err) {
       console.error('Error loading data:', err);
       setError(err.message || 'Failed to connect to backend server');
       setServerStatus({ status: 'offline' });
+      if (isManual) {
+        showToast('error', 'Sync Failed', err.message || 'Could not reach backend server.');
+      }
     } finally {
       setLoading(false);
       setIsRefreshing(false);
     }
   }, [searchQuery, selectedCategory, selectedStatus, sortBy]);
 
-  // Initial load
+  // Initial load + background polling every 12s
   useEffect(() => {
-    loadData(true);
+    loadData(true, false);
+
+    const timer = setInterval(() => {
+      loadData(false, false);
+    }, 12000);
+
+    return () => clearInterval(timer);
   }, [loadData]);
+
+  // Handle manual sync button click
+  const handleManualSync = () => {
+    loadData(false, true);
+  };
 
   // Handle status update
   const handleStatusChange = async (ticketId, newStatus) => {
@@ -107,6 +138,7 @@ export function App() {
       // Refresh stats in background
       const newStats = await getStats().catch(() => null);
       if (newStats?.stats) setStats(newStats.stats);
+      setLastSyncedAt(formatCurrentTime());
 
       showToast(
         'success',
@@ -137,6 +169,7 @@ export function App() {
       // Update stats
       const newStats = await getStats().catch(() => null);
       if (newStats?.stats) setStats(newStats.stats);
+      setLastSyncedAt(formatCurrentTime());
 
       showToast(
         'success',
@@ -155,6 +188,7 @@ export function App() {
       // Update stats
       const newStats = await getStats().catch(() => null);
       if (newStats?.stats) setStats(newStats.stats);
+      setLastSyncedAt(formatCurrentTime());
 
       showToast('info', 'Ticket Removed', `Ticket ${ticketId} has been deleted.`);
     } catch (err) {
@@ -181,8 +215,9 @@ export function App() {
       <Navbar
         serverStatus={serverStatus}
         onOpenNewModal={() => setIsModalOpen(true)}
-        onRefresh={() => loadData(false)}
+        onRefresh={handleManualSync}
         isRefreshing={isRefreshing}
+        lastSyncedAt={lastSyncedAt}
         ticketCount={tickets.length}
       />
 
@@ -231,7 +266,7 @@ export function App() {
               <EmptyState 
                 type="error" 
                 errorMessage={error} 
-                onRetry={() => loadData(true)} 
+                onRetry={() => loadData(true, true)} 
               />
             ) : tickets.length === 0 ? (
               <EmptyState

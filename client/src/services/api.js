@@ -1,13 +1,47 @@
 /**
  * API Client for Campus Helpdesk
- * Connects directly to Express REST endpoints with resilient error handling
+ * Connects to Express REST endpoints with dual-layer proxy & direct fallback
  */
 
-const API_BASE = '/api';
+const PROXY_API = '/api';
+const DIRECT_API = 'http://localhost:5000/api';
+
+const resilientFetch = async (endpoint, options = {}, timeoutMs = 6000) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const res = await fetch(`${PROXY_API}${endpoint}`, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok && res.status >= 500) {
+      throw new Error(`Proxy error ${res.status}`);
+    }
+    return res;
+  } catch (err) {
+    clearTimeout(timer);
+    // Fallback to direct Express backend at port 5000
+    const directController = new AbortController();
+    const directTimer = setTimeout(() => directController.abort(), timeoutMs);
+    try {
+      const directRes = await fetch(`${DIRECT_API}${endpoint}`, {
+        ...options,
+        signal: directController.signal,
+      });
+      clearTimeout(directTimer);
+      return directRes;
+    } catch (fallbackErr) {
+      clearTimeout(directTimer);
+      throw new Error(`Server connection failed: ${fallbackErr.message}`);
+    }
+  }
+};
 
 export const checkHealth = async () => {
   try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
+    const res = await resilientFetch('/health', {}, 3000);
     if (!res.ok) throw new Error(`Health check returned status ${res.status}`);
     return await res.json();
   } catch (error) {
@@ -22,8 +56,8 @@ export const getTickets = async (filters = {}) => {
   if (filters.status && filters.status !== 'All') params.append('status', filters.status);
   if (filters.sortBy) params.append('sortBy', filters.sortBy);
 
-  const url = `${API_BASE}/tickets${params.toString() ? `?${params.toString()}` : ''}`;
-  const res = await fetch(url);
+  const endpoint = `/tickets${params.toString() ? `?${params.toString()}` : ''}`;
+  const res = await resilientFetch(endpoint);
   
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
@@ -34,7 +68,7 @@ export const getTickets = async (filters = {}) => {
 };
 
 export const getStats = async () => {
-  const res = await fetch(`${API_BASE}/tickets/stats`);
+  const res = await resilientFetch('/tickets/stats');
   if (!res.ok) {
     throw new Error(`Failed to fetch stats (${res.status})`);
   }
@@ -42,7 +76,7 @@ export const getStats = async () => {
 };
 
 export const createTicket = async (ticketData) => {
-  const res = await fetch(`${API_BASE}/tickets`, {
+  const res = await resilientFetch('/tickets', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -62,7 +96,7 @@ export const createTicket = async (ticketData) => {
 };
 
 export const updateTicketStatus = async (ticketId, status, note = '') => {
-  const res = await fetch(`${API_BASE}/tickets/${encodeURIComponent(ticketId)}/status`, {
+  const res = await resilientFetch(`/tickets/${encodeURIComponent(ticketId)}/status`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -80,7 +114,7 @@ export const updateTicketStatus = async (ticketId, status, note = '') => {
 };
 
 export const deleteTicket = async (ticketId) => {
-  const res = await fetch(`${API_BASE}/tickets/${encodeURIComponent(ticketId)}`, {
+  const res = await resilientFetch(`/tickets/${encodeURIComponent(ticketId)}`, {
     method: 'DELETE',
   });
 
